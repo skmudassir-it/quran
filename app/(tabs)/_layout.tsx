@@ -45,21 +45,21 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="listen"
+          name="listen/index"
           options={{
             title: Strings.nav_tab_audio,
             tabBarIcon: ({ color }) => <TabIcon name="headset" color={color} />,
           }}
         />
         <Tabs.Screen
-          name="calendar"
+          name="calendar/index"
           options={{
             title: Strings.nav_tab_calendar,
             tabBarIcon: ({ color }) => <TabIcon name="calendar" color={color} />,
           }}
         />
         <Tabs.Screen
-          name="prayers"
+          name="prayers/index"
           options={{
             title: Strings.nav_tab_prayers,
             tabBarIcon: ({ color }) => <TabIcon name="alarm" color={color} />,

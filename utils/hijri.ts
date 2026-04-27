@@ -27,25 +27,20 @@ export function toHijri(date: Date): HijriDate {
   const m = date.getMonth() + 1;
   const y = date.getFullYear();
 
-  // Gregorian to Julian Day Number
+  // Gregorian → Julian Day Number (proleptic Gregorian calendar algorithm)
+  const a = Math.floor((14 - m) / 12);
+  const ye = y + 4800 - a;
+  const me = m + 12 * a - 3;
   const jd =
-    Math.floor((14 - m) / 12) === 0
-      ? d +
-        Math.floor((153 * (m - 3) + 2) / 5) +
-        365 * y +
-        Math.floor(y / 4) -
-        Math.floor(y / 100) +
-        Math.floor(y / 400) -
-        32045
-      : d +
-        Math.floor((153 * (m + 9) + 2) / 5) +
-        365 * (y - 1) +
-        Math.floor((y - 1) / 4) -
-        Math.floor((y - 1) / 100) +
-        Math.floor((y - 1) / 400) -
-        32045;
+    d +
+    Math.floor((153 * me + 2) / 5) +
+    365 * ye +
+    Math.floor(ye / 4) -
+    Math.floor(ye / 100) +
+    Math.floor(ye / 400) -
+    32045;
 
-  // Julian Day to Hijri (astronomical algorithm)
+  // Julian Day → Hijri (tabular Islamic calendar algorithm)
   const l = jd - 1948440 + 10632;
   const n = Math.floor((l - 1) / 10631);
   const l2 = l - 10631 * n + 354;

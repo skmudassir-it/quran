@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Modal,
@@ -28,7 +28,7 @@ const PRAYER_ICONS: Record<string, React.ComponentProps<typeof Ionicons>['name']
   fajr: 'partly-sunny-outline',
   dhuhr: 'sunny-outline',
   asr: 'cloud-outline',
-  maghrib: 'sunset-outline',
+  maghrib: 'cloudy-night-outline',
   isha: 'moon-outline',
 };
 

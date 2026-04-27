@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -38,7 +38,7 @@ export default function SurahReaderScreen() {
 
   const { nowPlaying, isPlaying, play, pause, resume } = useAudioStore();
   const { addBookmark, removeBookmark, isBookmarked } = useBookmarkStore();
-  const { arabicFontSize, setArabicFontSize, showTranslation, setLastRead } =
+  const { arabicFontSize, setArabicFontSize, showTranslation, setShowTranslation, setLastRead } =
     usePreferencesStore();
 
   const isCurrentSurah =
@@ -50,20 +50,31 @@ export default function SurahReaderScreen() {
     fetchSurah(surahNumber)
       .then((result) => {
         setData(result);
-        navigation.setOptions({
-          title: `${result.info.englishName} · ${result.info.name}`,
-          headerRight: () => (
-            <View style={{ flexDirection: 'row', gap: 12, marginRight: 8 }}>
-              <Pressable onPress={() => setShowFontModal(true)} hitSlop={8}>
-                <Ionicons name="text" size={22} color="#FFFFFF" />
-              </Pressable>
-            </View>
-          ),
-        });
+        navigation.setOptions({ title: `${result.info.englishName} · ${result.info.name}` });
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [surahNumber]);
+
+  // Separate effect so the header icons always reflect current toggle state
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <View style={{ flexDirection: 'row', gap: 14, marginRight: 8 }}>
+          <Pressable onPress={() => setShowTranslation(!showTranslation)} hitSlop={8}>
+            <Ionicons
+              name={showTranslation ? 'language' : 'language-outline'}
+              size={22}
+              color="#FFFFFF"
+            />
+          </Pressable>
+          <Pressable onPress={() => setShowFontModal(true)} hitSlop={8}>
+            <Ionicons name="text" size={22} color="#FFFFFF" />
+          </Pressable>
+        </View>
+      ),
+    });
+  }, [showTranslation, setShowTranslation]);
 
   function handleVersePlay(verse: Verse) {
     if (!data) return;

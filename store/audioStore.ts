@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { AVPlaybackStatus } from 'expo-av';
-import { audioService, verseAudioUrl, RECITERS, type ReciterId } from '@/services/audioService';
+import { audioService, verseAudioUrl } from '@/services/audioService';
+import { usePreferencesStore } from '@/store/preferencesStore';
 
 interface NowPlaying {
   surahNumber: number;
@@ -13,7 +14,6 @@ interface AudioState {
   nowPlaying: NowPlaying | null;
   isPlaying: boolean;
   isLoading: boolean;
-  reciterId: ReciterId;
   durationMs: number;
   positionMs: number;
 
@@ -23,20 +23,20 @@ interface AudioState {
   stop: () => Promise<void>;
   nextVerse: () => Promise<void>;
   prevVerse: () => Promise<void>;
-  setReciter: (id: ReciterId) => void;
 }
 
 export const useAudioStore = create<AudioState>((set, get) => ({
   nowPlaying: null,
   isPlaying: false,
   isLoading: false,
-  reciterId: RECITERS[0].id,
   durationMs: 0,
   positionMs: 0,
 
   play: async (info) => {
     set({ isLoading: true, nowPlaying: info });
-    const url = verseAudioUrl(info.surahNumber, info.verseNumber, get().reciterId);
+    // Always reads the current reciter from the single source of truth
+    const reciterId = usePreferencesStore.getState().reciterId;
+    const url = verseAudioUrl(info.surahNumber, info.verseNumber, reciterId);
     await audioService.load(url, (status: AVPlaybackStatus) => {
       if (!status.isLoaded) return;
       set({
@@ -45,7 +45,6 @@ export const useAudioStore = create<AudioState>((set, get) => ({
         durationMs: status.durationMillis ?? 0,
         isLoading: false,
       });
-      // Auto-advance to next verse when finished
       if (status.didJustFinish) {
         get().nextVerse();
       }
@@ -81,6 +80,4 @@ export const useAudioStore = create<AudioState>((set, get) => ({
     if (nowPlaying.verseNumber <= 1) return;
     await get().play({ ...nowPlaying, verseNumber: nowPlaying.verseNumber - 1 });
   },
-
-  setReciter: (id) => set({ reciterId: id }),
 }));
